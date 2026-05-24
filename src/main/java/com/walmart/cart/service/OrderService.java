@@ -1,11 +1,9 @@
 package com.walmart.cart.service;
 
-import com.walmart.cart.dto.OrderItemRequest;
 import com.walmart.cart.dto.OrderTrackingResponse;
 import com.walmart.cart.model.*;
 import com.walmart.cart.repository.CartRepository;
 import com.walmart.cart.repository.OrderRepository;
-import com.walmart.cart.repository.ProductRepository;
 import com.walmart.cart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,39 +21,25 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
-    private final ProductRepository productRepository;
 
     @Transactional
-    public Order placeOrder(Long userId, java.util.List<OrderItemRequest> items) {
+    public Order placeOrder(Long userId, Long cartId) {
         User user = resolveUser(userId);
 
-        if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("Order must contain at least one item");
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
+
+        if (!cart.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("Cart does not belong to user: " + user.getId());
         }
 
-        Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseGet(() -> cartRepository.save(Cart.builder()
-                        .user(user)
-                        .preFilled(false)
-                        .build()));
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Cart is empty: " + cartId + ". Pre-fill cart before placing order.");
+        }
 
-        cart.getItems().clear();
-
-        BigDecimal total = items.stream()
-                .map(reqItem -> {
-                    Product product = productRepository.findById(reqItem.productId())
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found: " + reqItem.productId()));
-                    CartItem cartItem = CartItem.builder()
-                            .cart(cart)
-                            .product(product)
-                            .quantity(reqItem.quantity())
-                            .build();
-                    cart.getItems().add(cartItem);
-                    return product.getPrice().multiply(BigDecimal.valueOf(reqItem.quantity()));
-                })
+        BigDecimal total = cart.getItems().stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        cartRepository.save(cart);
 
         LocalDateTime now = LocalDateTime.now();
         Order order = Order.builder()

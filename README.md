@@ -29,7 +29,6 @@ mvn spring-boot:run
 
 ### Cart Management
 - `POST /api/cart/pre-fill`
-- `POST /api/cart/items`
 
 ### Orders & Tracking
 - `POST /api/orders`
@@ -72,10 +71,7 @@ If using VS Code:
 ```json
 {
   "userId": 1,
-  "items": [
-    { "productId": 1, "quantity": 2 },
-    { "productId": 2, "quantity": 1 }
-  ]
+  "cartId": 1
 }
 ```
 
@@ -88,18 +84,14 @@ For a fresh app run, call APIs in this order to avoid empty-cart errors:
 
 1. **Fetch essentials**
    - `GET /api/products/essentials`
-2. **Create/fill cart** (choose one)
-   - `POST /api/cart/pre-fill` with `{ "userId": 1 }`
-   - OR `POST /api/cart/items` with `{ "userId": 1, "productId": 1, "quantity": 2 }`
+2. **Create/fill cart**
+   - `POST /api/cart/pre-fill` with `{ "userId": 1 }` or custom items payload
 3. **Place order**
    - `POST /api/orders` with:
    ```json
    {
      "userId": 1,
-     "items": [
-       { "productId": 1, "quantity": 2 },
-       { "productId": 2, "quantity": 1 }
-     ]
+     "cartId": 1
    }
    ```
 4. **Track order**

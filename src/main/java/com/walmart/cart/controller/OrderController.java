@@ -25,7 +25,7 @@ public class OrderController {
     @ApiResponse(responseCode = "201", description = "Order placed successfully")
     @PostMapping
     public ResponseEntity<Order> placeOrder(@RequestBody @Valid CreateOrderRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(request.userId(), request.items()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(request.userId(), request.cartId()));
     }
 
     @Operation(summary = "Track order status for 60-minute tracker")
