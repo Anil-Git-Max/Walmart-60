@@ -5,6 +5,7 @@ import com.walmart.cart.dto.OrderTrackingResponse;
 import com.walmart.cart.model.Order;
 import com.walmart.cart.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,7 +32,7 @@ public class OrderController {
     @Operation(summary = "Track order status for 60-minute tracker")
     @ApiResponse(responseCode = "200", description = "Order tracking details returned")
     @GetMapping("/{id}/track")
-    public ResponseEntity<OrderTrackingResponse> trackOrder(@PathVariable Long id) {
+    public ResponseEntity<OrderTrackingResponse> trackOrder(@Parameter(description = "Order ID", example = "1") @PathVariable Long id) {
         return ResponseEntity.ok(orderService.trackOrder(id));
     }
 }

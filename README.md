@@ -104,7 +104,7 @@ For a fresh app run, call APIs in this order to avoid empty-cart errors:
 ### Sample pre-fill payload
 ```json
 {
-  "userId": 0,
+  "userId": 1,
   "items": [
     { "productId": 1, "quantity": 1 },
     { "productId": 2, "quantity": 2 }
