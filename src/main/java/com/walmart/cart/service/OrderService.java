@@ -34,7 +34,10 @@ public class OrderService {
         }
 
         Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("No cart found for user: " + user.getId()));
+                .orElseGet(() -> cartRepository.save(Cart.builder()
+                        .user(user)
+                        .preFilled(false)
+                        .build()));
 
         cart.getItems().clear();
 

@@ -81,3 +81,29 @@ If using VS Code:
 
 
 > Note: `POST /api/orders` accepts `userId: 0` (or negative) to use the default seeded user automatically.
+
+
+## Recommended API execution order
+For a fresh app run, call APIs in this order to avoid empty-cart errors:
+
+1. **Fetch essentials**
+   - `GET /api/products/essentials`
+2. **Create/fill cart** (choose one)
+   - `POST /api/cart/pre-fill` with `{ "userId": 1 }`
+   - OR `POST /api/cart/items` with `{ "userId": 1, "productId": 1, "quantity": 2 }`
+3. **Place order**
+   - `POST /api/orders` with:
+   ```json
+   {
+     "userId": 1,
+     "items": [
+       { "productId": 1, "quantity": 2 },
+       { "productId": 2, "quantity": 1 }
+     ]
+   }
+   ```
+4. **Track order**
+   - `GET /api/orders/{orderId}/track`
+
+### Behavior update
+`POST /api/orders` now auto-creates a cart for the user if one does not already exist, then syncs submitted items into that cart before creating the order.
