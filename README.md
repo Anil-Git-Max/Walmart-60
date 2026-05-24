@@ -78,3 +78,6 @@ If using VS Code:
   ]
 }
 ```
+
+
+> Note: `POST /api/orders` accepts `userId: 0` (or negative) to use the default seeded user automatically.

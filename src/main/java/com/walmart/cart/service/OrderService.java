@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +27,14 @@ public class OrderService {
 
     @Transactional
     public Order placeOrder(Long userId, java.util.List<OrderItemRequest> items) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        User user = resolveUser(userId);
 
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("Order must contain at least one item");
         }
 
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("No cart found for user: " + userId));
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No cart found for user: " + user.getId()));
 
         cart.getItems().clear();
 
@@ -64,6 +64,18 @@ public class OrderService {
                 .build();
 
         return orderRepository.save(order);
+    }
+
+
+    private User resolveUser(Long userId) {
+        if (userId == null || userId <= 0) {
+            return userRepository.findAll().stream()
+                    .min(Comparator.comparing(User::getId))
+                    .orElseThrow(() -> new IllegalArgumentException("No users available. Seed data may be missing."));
+        }
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId + ". Use an existing userId or 0 to use default seeded user."));
     }
 
     public OrderTrackingResponse trackOrder(Long orderId) {
