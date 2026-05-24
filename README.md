@@ -66,3 +66,15 @@ If using VS Code:
 1. Install **Extension Pack for Java**.
 2. Run **Java: Clean Java Language Server Workspace**.
 3. Reimport Maven project.
+
+
+### Sample order payload
+```json
+{
+  "userId": 1,
+  "items": [
+    { "productId": 1, "quantity": 2 },
+    { "productId": 2, "quantity": 1 }
+  ]
+}
+```

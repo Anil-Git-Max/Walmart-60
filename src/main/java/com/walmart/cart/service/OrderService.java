@@ -1,9 +1,11 @@
 package com.walmart.cart.service;
 
+import com.walmart.cart.dto.OrderItemRequest;
 import com.walmart.cart.dto.OrderTrackingResponse;
 import com.walmart.cart.model.*;
 import com.walmart.cart.repository.CartRepository;
 import com.walmart.cart.repository.OrderRepository;
+import com.walmart.cart.repository.ProductRepository;
 import com.walmart.cart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,18 +22,37 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
-    public Order placeOrder(Long userId) {
+    public Order placeOrder(Long userId, java.util.List<OrderItemRequest> items) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item");
+        }
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("No cart found for user: " + userId));
 
-        BigDecimal total = cart.getItems().stream()
-                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+        cart.getItems().clear();
+
+        BigDecimal total = items.stream()
+                .map(reqItem -> {
+                    Product product = productRepository.findById(reqItem.productId())
+                            .orElseThrow(() -> new IllegalArgumentException("Product not found: " + reqItem.productId()));
+                    CartItem cartItem = CartItem.builder()
+                            .cart(cart)
+                            .product(product)
+                            .quantity(reqItem.quantity())
+                            .build();
+                    cart.getItems().add(cartItem);
+                    return product.getPrice().multiply(BigDecimal.valueOf(reqItem.quantity()));
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        cartRepository.save(cart);
 
         LocalDateTime now = LocalDateTime.now();
         Order order = Order.builder()

@@ -1,6 +1,13 @@
 package com.walmart.cart.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public record CreateOrderRequest(@NotNull Long userId) {
+import java.util.List;
+
+public record CreateOrderRequest(
+        @NotNull Long userId,
+        @NotEmpty List<@Valid OrderItemRequest> items
+) {
 }
