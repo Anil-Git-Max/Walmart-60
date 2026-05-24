@@ -32,7 +32,7 @@ public class OrderController {
     @Operation(summary = "Track order status for 60-minute tracker")
     @ApiResponse(responseCode = "200", description = "Order tracking details returned")
     @GetMapping("/{id}/track")
-    public ResponseEntity<OrderTrackingResponse> trackOrder(@Parameter(description = "Order ID", example = "1") @PathVariable Long id) {
+    public ResponseEntity<OrderTrackingResponse> trackOrder(@Parameter(description = "Order ID", example = "1") @PathVariable("id") Long id) {
         return ResponseEntity.ok(orderService.trackOrder(id));
     }
 }
