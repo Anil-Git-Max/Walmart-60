@@ -121,3 +121,5 @@ For a fresh app run, call APIs in this order to avoid empty-cart errors:
 ```
 
 If `items` is omitted or empty, the API pre-fills with default essentials.
+
+If an item has `productId: 0` (or negative/null), it is ignored; when all provided items are invalid, pre-fill falls back to default essentials.

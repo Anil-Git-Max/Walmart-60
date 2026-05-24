@@ -28,8 +28,13 @@ public class CartService {
                 .orElseGet(() -> cartRepository.save(Cart.builder().user(user).preFilled(true).build()));
 
         cart.setPreFilled(true);
-        if (requestedItems != null && !requestedItems.isEmpty()) {
-            for (PrefillCartItemRequest item : requestedItems) {
+        List<PrefillCartItemRequest> validRequestedItems = requestedItems == null ? List.of() :
+                requestedItems.stream()
+                        .filter(item -> item.productId() != null && item.productId() > 0)
+                        .toList();
+
+        if (!validRequestedItems.isEmpty()) {
+            for (PrefillCartItemRequest item : validRequestedItems) {
                 Product product = productRepository.findById(item.productId())
                         .orElseThrow(() -> new IllegalArgumentException("Product not found: " + item.productId()));
                 CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
