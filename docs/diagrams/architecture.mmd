@@ -1,0 +1,63 @@
+flowchart TB
+    subgraph Client[Client Layer]
+      UI[UI Prototype / Web App]
+      SW[Swagger UI]
+    end
+
+    subgraph API[Spring Boot API Layer]
+      PC[ProductController]
+      CC[CartController]
+      OC[OrderController]
+      GEH[GlobalExceptionHandler]
+    end
+
+    subgraph Service[Service Layer]
+      PS[ProductService]
+      CS[CartService]
+      OS[OrderService]
+      DI[DataInitializer]
+    end
+
+    subgraph Data[Persistence Layer]
+      PR[ProductRepository]
+      CR[CartRepository]
+      CIR[CartItemRepository]
+      OR[OrderRepository]
+      UR[UserRepository]
+    end
+
+    subgraph DB[Database]
+      H2[(H2 In-Memory DB)]
+      ENT[Entities: User, Product, Cart, CartItem, Order]
+    end
+
+    UI --> PC
+    UI --> CC
+    UI --> OC
+    SW --> PC
+    SW --> CC
+    SW --> OC
+
+    PC --> PS
+    CC --> CS
+    OC --> OS
+
+    PS --> PR
+    CS --> CR
+    CS --> CIR
+    CS --> PR
+    CS --> UR
+    OS --> OR
+    OS --> CR
+    OS --> UR
+
+    DI --> PR
+    DI --> UR
+
+    PR --> H2
+    CR --> H2
+    CIR --> H2
+    OR --> H2
+    UR --> H2
+    ENT --> H2
+    GEH -. handles exceptions for .-> API

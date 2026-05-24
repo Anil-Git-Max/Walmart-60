@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant C as CartController
+    participant CS as CartService
+    participant PRepo as ProductRepository
+    participant CartRepo as CartRepository
+    participant O as OrderController
+    participant OS as OrderService
+    participant ORepo as OrderRepository
+
+    U->>C: POST /api/cart/pre-fill { userId }
+    C->>CS: preFillCart(userId)
+    CS->>CartRepo: findByUserId(userId)
+    CS->>PRepo: findByEssentialTrue()
+    CS->>CartRepo: save cart/items
+    C-->>U: 201 Created + Cart
+
+    U->>O: POST /api/orders { userId }
+    O->>OS: placeOrder(userId)
+    OS->>CartRepo: findByUserId(userId)
+    OS->>OS: compute total + ETA(now + 60)
+    OS->>ORepo: save(order)
+    O-->>U: 201 Created + Order
+
+    loop tracker polling
+      U->>O: GET /api/orders/{id}/track
+      O->>OS: trackOrder(orderId)
+      OS->>ORepo: findById(orderId)
+      OS->>OS: derive stage from elapsed time
+      OS->>ORepo: save(status if changed)
+      O-->>U: 200 OK + status/stage/countdown
+    end

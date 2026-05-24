@@ -1,0 +1,30 @@
+flowchart TB
+    subgraph TrustBoundary1[Public Client Boundary]
+      Client[Client / UI]
+    end
+
+    subgraph TrustBoundary2[Application Boundary - Spring Boot]
+      Controllers[REST Controllers]
+      Validation[Bean Validation @Valid/@NotNull/@Min]
+      ExceptionHandler[GlobalExceptionHandler]
+      Services[Business Services]
+    end
+
+    subgraph TrustBoundary3[Data Boundary]
+      JPA[JPA Repositories]
+      H2[(H2 In-Memory DB)]
+    end
+
+    Client -->|HTTP JSON| Controllers
+    Controllers --> Validation
+    Validation --> Services
+    Services --> JPA
+    JPA --> H2
+
+    Controllers --> ExceptionHandler
+
+    Threat1[[Input Tampering]] -. mitigated by .-> Validation
+    Threat2[[Unhandled Errors / Info Leakage]] -. mitigated by .-> ExceptionHandler
+    Threat3[[SQL Injection]] -. mitigated by .-> JPA
+    Threat4[[Unauthorized Access]] -. gap: no authn/authz in current code .-> Controllers
+    Threat5[[Sensitive data in prod memory DB]] -. gap: H2 only for demo/dev .-> H2
