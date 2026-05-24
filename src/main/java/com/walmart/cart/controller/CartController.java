@@ -6,12 +6,14 @@ import com.walmart.cart.model.Cart;
 import com.walmart.cart.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "2. Cart APIs")
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
