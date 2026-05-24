@@ -23,7 +23,7 @@ public class CartController {
     @ApiResponse(responseCode = "201", description = "Cart pre-filled successfully")
     @PostMapping("/pre-fill")
     public ResponseEntity<Cart> preFillCart(@RequestBody @Valid PrefillCartRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.preFillCart(request.userId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.preFillCart(request.userId(), request.items()));
     }
 
     @Operation(summary = "Add or update a cart item")

@@ -1,6 +1,12 @@
 package com.walmart.cart.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-public record PrefillCartRequest(@NotNull Long userId) {
+import java.util.List;
+
+public record PrefillCartRequest(
+        @NotNull Long userId,
+        List<@Valid PrefillCartItemRequest> items
+) {
 }

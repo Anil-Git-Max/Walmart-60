@@ -107,3 +107,17 @@ For a fresh app run, call APIs in this order to avoid empty-cart errors:
 
 ### Behavior update
 `POST /api/orders` now auto-creates a cart for the user if one does not already exist, then syncs submitted items into that cart before creating the order.
+
+
+### Sample pre-fill payload
+```json
+{
+  "userId": 0,
+  "items": [
+    { "productId": 1, "quantity": 1 },
+    { "productId": 2, "quantity": 2 }
+  ]
+}
+```
+
+If `items` is omitted or empty, the API pre-fills with default essentials.
